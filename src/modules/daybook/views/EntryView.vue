@@ -1,27 +1,33 @@
 <template>
   <div>
-    <div class="entry-title d-flex justify-content-between p-2">
-      <div>
-        <span class="text-success fs-3 fw-bold">15</span>
-        <span class="mx-1 fs-3">Julio</span>
-        <span class="mx-4 fs-4 fw-light">2023</span>
+    <template v-if="localEntry"
+      ><div class="entry-title d-flex justify-content-between p-2">
+        <div>
+          <span class="text-success fs-3 fw-bold">{{ day }}</span>
+          <span class="mx-1 fs-3">{{ month }}</span>
+          <span class="mx-4 fs-4 fw-light">{{ year }}, {{ weekday }}</span>
+        </div>
+        <div>
+          <button class="btn btn-danger">
+            Borrar
+            <i class="fa fa-trash-alt"></i>
+          </button>
+          <button class="btn btn-primary">
+            Subir foto
+            <i class="fa fa-upload"></i>
+          </button>
+        </div>
       </div>
-      <div>
-        <button class="btn btn-danger">
-          Borrar
-          <i class="fa fa-trash-alt"></i>
-        </button>
-        <button class="btn btn-primary">
-          Subir foto
-          <i class="fa fa-upload"></i>
-        </button>
+      <hr />
+      <div class="d-flex flex-column px-3 h-75">
+        <textarea
+          placeholder="What happend today?"
+          v-model="localEntry.text"
+        ></textarea>
       </div>
-    </div>
-    <hr />
-    <div class="d-flex flex-column px-3 h-75">
-      <textarea placeholder="What happend today?"></textarea>
-    </div>
-    <FloatingBtn icon="fa-save"/>
+    </template>
+
+    <FloatingBtn icon="fa-save" />
     <img
       src="https://img.freepik.com/free-photo/trees-forest-backgrounds_23-2148914433.jpg?w=1380&t=st=1682590447~exp=1682591047~hmac=9749be96b208ff784fa7dd857325c0097d2bc129392a3d0584e0fa8b01949a67"
       alt="picture"
@@ -31,16 +37,65 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import getDates from "../helpers/getDates";
 export default {
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+  },
   components: {
     FloatingBtn: () => import("../components/FloatingBtn"),
+  },
+
+  data() {
+    return {
+      localEntry: null,
+    };
+  },
+
+  computed: {
+    ...mapGetters("journal", ["getEntryById"]),
+    day() {
+      const { day } = getDates(this.localEntry.date);
+      return day;
+    },
+    month() {
+      const { month } = getDates(this.localEntry.date);
+      return month;
+    },
+    year() {
+      const { year } = getDates(this.localEntry.date);
+      return year;
+    },
+    weekday() {
+      const { weekday } = getDates(this.localEntry.date);
+      return weekday;
+    },
+  },
+  methods: {
+    loadEnrty() {
+      const entry = this.getEntryById(this.id);
+      if (!entry) return this.$router.push({ name: "no-entry" });
+      this.localEntry = entry;
+    },
+  },
+  created() {
+    this.loadEnrty();
+  },
+  watch: {
+    id() {
+      this.loadEnrty();
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 textarea {
-  font-size: 2rem;
+  font-size: 1rem;
   border: none;
   height: 100%;
   &:focus {

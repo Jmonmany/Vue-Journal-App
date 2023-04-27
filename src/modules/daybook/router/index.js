@@ -1,5 +1,4 @@
 export default {
-  name: "daybook",
   component: () =>
     import(
       /* webpackChunkName: 'daybook' */ "@/modules/daybook/layouts/DayBookLayout"
@@ -20,6 +19,9 @@ export default {
         import(
           /* webpackChunkName: 'daybook-entry' */ "@/modules/daybook/views/EntryView"
         ),
+      props: (route) => {
+        return { id: route.params.id };
+      },
     },
   ],
 };
