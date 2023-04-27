@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavBar />
-    <div class="d-flix">
+    <div class="d-flex">
       <div class="col-4"><EntryList /></div>
       <div class="col">
         <router-view />
@@ -21,4 +21,4 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped></style>

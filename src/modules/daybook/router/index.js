@@ -4,7 +4,14 @@ export default {
     import(
       /* webpackChunkName: 'daybook' */ "@/modules/daybook/layouts/DayBookLayout"
     ),
-    children: [
-        
-    ],
+  children: [
+    {
+      path: "",
+      name: "no-entry",
+      component: () =>
+        import(
+          /* webpackChunkName: 'daybook-no-entry' */ "@/modules/daybook/views/NoEntrySelected"
+        ),
+    },
+  ],
 };
