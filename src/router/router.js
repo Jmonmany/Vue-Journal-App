@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "@/views/Home";
-import About from "@/views/About";
+import daybookRouter from "@/modules/daybook/router";
+
 const routes = [
   {
     path: "/",
@@ -11,7 +12,11 @@ const routes = [
   {
     path: "/about",
     name: "About",
-    component: About,
+    component: () => import(/* webpackChunkName: 'about' */ "@/views/About"),
+  },
+  {
+    path: "/daybook",
+    ...daybookRouter,
   },
 ];
 
