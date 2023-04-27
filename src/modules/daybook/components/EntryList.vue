@@ -1,19 +1,37 @@
 <template>
   <div class="entry-list-container">
     <div class="px-2 pt-2">
-      <input type="text" class="form-control" placeholder="Search" />
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search"
+        v-model="term"
+      />
     </div>
     <div class="entry-scrollarea">
-      <EntryContent v-for="item in 100" :key="item"></EntryContent>
+      <EntryContent v-for="entry in entriesByTerm" :key="entry.id" :entry="entry"></EntryContent>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   components: {
     EntryContent: () =>
       import(/* webpackChunkName: "entry-component" */ "./EntryContent"),
+  },
+  computed: {
+    ...mapGetters("journal", ["getEntriesBtTerm"]),
+    entriesByTerm() {
+      return this.getEntriesBtTerm(this.term);
+    },
+  },
+  data() {
+    return {
+      term: "",
+    };
   },
 };
 </script>

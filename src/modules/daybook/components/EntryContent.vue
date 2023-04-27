@@ -1,24 +1,75 @@
 <template>
   <div
     class="entry-container mb-3 pointer p-2"
-    @click="$router.push({ name: 'entry', params: { id: 10 } })"
+    @click="$router.push({ name: 'entry', params: { id: entry.id } })"
   >
     <div class="entry-title d-flex">
-      <span class="text-success fs-5 fw-bold">27</span>
-      <span class="mx-1 fs-5">April</span>
-      <span class="mx-2 fw-light">2023, THU</span>
+      <span class="text-success fs-5 fw-bold">{{ dayNumber }}</span>
+      <span class="mx-1 fs-5">{{ month }}</span>
+      <span class="mx-2 fw-light">{{ year }}, {{ dayName }}</span>
     </div>
     <div class="entry-description">
-      Laboris velit est et minim laborum. Ullamco ut eiusmod excepteur aliquip
-      aute dolor mollit duis eiusmod minim. Adipisicing eiusmod duis labore
-      consequat quis veniam ea Lorem irure magna adipisicing tempor adipisicing
-      incididunt. Mollit eiusmod eu ex eu aliquip amet magna ut qui voluptate.
+      {{ shortText }}
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const days = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+export default {
+  props: {
+    entry: {
+      type: Object,
+      required: true,
+    },
+  },
+  computed: {
+    shortText() {
+      return this.entry.text.length > 130
+        ? this.entry.text.substring(0, 130) + "..."
+        : this.entry.text;
+    },
+    dayNumber() {
+      const date = new Date(this.entry.date);
+      return date.getDate();
+    },
+    month() {
+      const date = new Date(this.entry.date);
+      return months[date.getMonth()];
+    },
+    year() {
+      const date = new Date(this.entry.date);
+      return date.getFullYear();
+    },
+    dayName() {
+      const date = new Date(this.entry.date);
+      return days[date.getDay()];
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
