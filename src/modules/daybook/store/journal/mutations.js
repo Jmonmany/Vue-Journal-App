@@ -1,10 +1,10 @@
-export const setEntries = (state) => {
-  state.count
+export const setEntries = (state, entries) => {
+  state.entries = [...state.entries, ...entries];
+  state.isLoading = false;
 };
 export const updateEntry = (state, payload) => {
-  state.count += payload;
-  state.lastMutation = "incrementBy " + payload;
-  state.lastRandom = payload;
+  const index = state.entries.map((entry) => entry.id).indexOf(payload.id);
+  state.entries[index] = payload;
 };
 export const addEntry = (state, payload) => {
   state.isLoading = payload;

@@ -27,7 +27,7 @@
       </div>
     </template>
 
-    <FloatingBtn icon="fa-save" />
+    <FloatingBtn icon="fa-save" @on:click="saveEntry" />
     <img
       src="https://img.freepik.com/free-photo/trees-forest-backgrounds_23-2148914433.jpg?w=1380&t=st=1682590447~exp=1682591047~hmac=9749be96b208ff784fa7dd857325c0097d2bc129392a3d0584e0fa8b01949a67"
       alt="picture"
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import getDates from "../helpers/getDates";
 export default {
   props: {
@@ -76,18 +76,22 @@ export default {
     },
   },
   methods: {
-    loadEnrty() {
+    ...mapActions("journal", ["updateEntry"]),
+    loadEntry() {
       const entry = this.getEntryById(this.id);
       if (!entry) return this.$router.push({ name: "no-entry" });
       this.localEntry = entry;
     },
+    async saveEntry() {
+      this.updateEntry(this.localEntry);
+    },
   },
   created() {
-    this.loadEnrty();
+    this.loadEntry();
   },
   watch: {
     id() {
-      this.loadEnrty();
+      this.loadEntry();
     },
   },
 };
