@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-center">
     <h1 class="align-self-center">No Selected</h1>
-    <FloatingBtn />
+    <FloatingBtn @on:click="goToAddEntry" />
   </div>
 </template>
 
@@ -12,6 +12,11 @@ export default {
       import(
         /* webpackChunkName: "floating-btn" */ "../components/FloatingBtn"
       ),
+  },
+  methods: {
+    goToAddEntry() {
+      this.$router.push({ name: "entry", params: { id: "new" } });
+    },
   },
 };
 </script>

@@ -8,7 +8,7 @@
           <span class="mx-4 fs-4 fw-light">{{ year }}, {{ weekday }}</span>
         </div>
         <div>
-          <button class="btn btn-danger">
+          <button v-if="localEntry.id" class="btn btn-danger" @click="onDeleteEntry">
             Borrar
             <i class="fa fa-trash-alt"></i>
           </button>
@@ -39,6 +39,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import getDates from "../helpers/getDates";
+import { deleteEntry } from '../store/journal/mutations';
 export default {
   props: {
     id: {
@@ -76,14 +77,31 @@ export default {
     },
   },
   methods: {
-    ...mapActions("journal", ["updateEntry"]),
-    loadEntry() {
-      const entry = this.getEntryById(this.id);
-      if (!entry) return this.$router.push({ name: "no-entry" });
+    ...mapActions("journal", ["updateEntry", "createEntry", "deleteEntry"]),
+    async loadEntry() {
+      let entry;
+      if (this.id === "new") {
+        entry = {
+          text: "",
+          date: new Date().getTime(),
+        };
+      } else {
+        entry = this.getEntryById(this.id);
+        if (!entry) return this.$router.push({ name: "no-entry" });
+      }
       this.localEntry = entry;
     },
     async saveEntry() {
-      this.updateEntry(this.localEntry);
+      if (this.localEntry.id) {
+        await this.updateEntry(this.localEntry);
+      } else {
+        const id = await this.createEntry(this.localEntry);
+        this.$router.push({ name: "entry", params: { id } });
+      }
+    },
+    async onDeleteEntry() {
+      await this.deleteEntry(this.localEntry.id);
+      this.$router.push({ name: "no-entry" });
     },
   },
   created() {

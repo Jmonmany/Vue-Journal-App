@@ -2,6 +2,12 @@ import journalApi from "@/api/journalApi";
 
 export const loadEntries = async ({ commit }) => {
   const { data } = await journalApi.get("/Entries.json");
+
+  if (!data) {
+    commit("setEntries", []);
+    return;
+  }
+
   const entries = [];
   for (let id of Object.keys(data)) {
     entries.push({
@@ -10,6 +16,7 @@ export const loadEntries = async ({ commit }) => {
     });
   }
   commit("setEntries", entries);
+  return entries;
 };
 export const updateEntry = async ({ commit }, entry) => {
   const { date, picture, text } = entry;
@@ -17,5 +24,17 @@ export const updateEntry = async ({ commit }, entry) => {
   const resp = await journalApi.put(`/Entries/${entry.id}.json`, dataToSave);
   commit("updateEntry", { ...entry });
 };
-export const createEntry = async () => {};
+export const createEntry = async ({ commit }, entry) => {
+  const { date, picture, text } = entry;
+  const dataToSave = { date, picture, text };
+  const { data } = await journalApi.post(`/Entries.json`, dataToSave);
+  dataToSave.id = data.name;
+  commit("addEntry", dataToSave);
+  return data.name;
+};
+export const deleteEntry = async ({ commit }, id) => {
+  await journalApi.delete(`/Entries/${id}.json`);
+  commit("deleteEntry", id);
+  return id;
+}
 // actions are async functions that will dialog with the backend
