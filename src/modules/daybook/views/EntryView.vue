@@ -8,8 +8,13 @@
           <span class="mx-4 fs-4 fw-light">{{ year }}, {{ weekday }}</span>
         </div>
         <div>
-
-          <input type="file">
+          <input
+            type="file"
+            @change="onSelectedImage"
+            ref="imageSelector"
+            v-show="false"
+            accept="image/png, image/jpeg"
+          />
 
           <button
             v-if="localEntry.id"
@@ -19,7 +24,7 @@
             Borrar
             <i class="fa fa-trash-alt"></i>
           </button>
-          <button class="btn btn-primary">
+          <button class="btn btn-primary" @click="selectImage">
             Subir foto
             <i class="fa fa-upload"></i>
           </button>
@@ -36,7 +41,14 @@
 
     <FloatingBtn icon="fa-save" @on:click="saveEntry" />
     <img
-      src="https://img.freepik.com/free-photo/trees-forest-backgrounds_23-2148914433.jpg?w=1380&t=st=1682590447~exp=1682591047~hmac=9749be96b208ff784fa7dd857325c0097d2bc129392a3d0584e0fa8b01949a67"
+      v-if="localEntry.picture && !localImage"
+      :src="localEntry.picture"
+      alt="picture"
+      class="img-thumbnail"
+    />
+    <img
+      v-if="localImage"
+      :src="localImage"
       alt="picture"
       class="img-thumbnail"
     />
@@ -47,6 +59,7 @@
 import { mapGetters, mapActions } from "vuex";
 import getDates from "../helpers/getDates";
 import Swal from "sweetalert2";
+import uploadImage from "../helpers/uploadImage";
 
 export default {
   props: {
@@ -62,6 +75,8 @@ export default {
   data() {
     return {
       localEntry: null,
+      localImage: null,
+      localFile: null,
     };
   },
 
@@ -105,6 +120,8 @@ export default {
         allowOutsideClick: false,
       });
       Swal.showLoading();
+      const picture = await uploadImage(this.localFile);
+      this.localEntry.picture = picture;
 
       if (this.localEntry.id) {
         await this.updateEntry(this.localEntry);
@@ -112,6 +129,7 @@ export default {
         const id = await this.createEntry(this.localEntry);
         this.$router.push({ name: "entry", params: { id } });
       }
+      this.file = null;
       Swal.fire("Saved", "", "success");
     },
     async onDeleteEntry() {
@@ -134,6 +152,26 @@ export default {
         this.$router.push({ name: "no-entry" });
         Swal.fire("Deleted", "", "success");
       }
+    },
+    onSelectedImage(event) {
+      const file = event.target.files[0];
+      if (!file) {
+        this.localImage = null;
+        this.localFile = null;
+        return;
+      }
+      this.localFile = file;
+      const reader = new FileReader();
+      // FileReader is an object that allows to read the content of a file
+      reader.onload = () => (this.localImage = reader.result);
+      // onload means that when the file is loaded, the function will be executed
+      reader.readAsDataURL(file);
+      // readAsDataURL is a method that allows to read the content of a file as a URL
+    },
+    selectImage() {
+      this.$refs.imageSelector.click();
+      // now we can click the button to select the image, to trigger the event on input type file
+      // so we can hide the input type file and show the button only
     },
   },
   created() {
