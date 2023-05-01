@@ -8,7 +8,14 @@
           <span class="mx-4 fs-4 fw-light">{{ year }}, {{ weekday }}</span>
         </div>
         <div>
-          <button v-if="localEntry.id" class="btn btn-danger" @click="onDeleteEntry">
+
+          <input type="file">
+
+          <button
+            v-if="localEntry.id"
+            class="btn btn-danger"
+            @click="onDeleteEntry"
+          >
             Borrar
             <i class="fa fa-trash-alt"></i>
           </button>
@@ -39,7 +46,8 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import getDates from "../helpers/getDates";
-import { deleteEntry } from '../store/journal/mutations';
+import Swal from "sweetalert2";
+
 export default {
   props: {
     id: {
@@ -92,16 +100,40 @@ export default {
       this.localEntry = entry;
     },
     async saveEntry() {
+      new Swal({
+        title: "Wait please",
+        allowOutsideClick: false,
+      });
+      Swal.showLoading();
+
       if (this.localEntry.id) {
         await this.updateEntry(this.localEntry);
       } else {
         const id = await this.createEntry(this.localEntry);
         this.$router.push({ name: "entry", params: { id } });
       }
+      Swal.fire("Saved", "", "success");
     },
     async onDeleteEntry() {
-      await this.deleteEntry(this.localEntry.id);
-      this.$router.push({ name: "no-entry" });
+      const { isConfirmed } = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, keep it",
+      });
+
+      if (isConfirmed) {
+        new Swal({
+          title: "Wait please",
+          allowOutsideClick: false,
+        });
+        Swal.showLoading();
+        await this.deleteEntry(this.localEntry.id);
+        this.$router.push({ name: "no-entry" });
+        Swal.fire("Deleted", "", "success");
+      }
     },
   },
   created() {
